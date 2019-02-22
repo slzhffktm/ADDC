@@ -98,13 +98,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void updateUI(GoogleSignInAccount acc) {
         if (acc != null) {
-            signInButton.setVisibility(View.GONE);
-            sharedPreferences = getApplicationContext().getSharedPreferences(APP_SHARED_PREFERENCES, Context.MODE_PRIVATE);
-            isUserLoggedIn = sharedPreferences.getBoolean("userLoggedInState", false);
-            editor = sharedPreferences.edit();
-            editor.putBoolean("userLoggedInState", true);
-            editor.putInt("currentLoggedInUserId", 1);
-            editor.apply();
+            if (!isAccountRegistered(acc)) {
+                registerAccount(acc);
+            }
 
             Intent main = new Intent(this, MainActivity.class);
             main.putExtra("reqFrom", "login");
@@ -113,5 +109,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         } else {
             signInButton.setVisibility(View.VISIBLE);
         }
+    }
+
+    // TODO: check account exist in database
+    private boolean isAccountRegistered(GoogleSignInAccount acc) {
+        String personName = acc.getDisplayName();
+        String personEmail = acc.getEmail();
+        String personId = acc.getId();
+
+        // check the account
+        return true;
+    }
+
+    // TODO: implement register account
+    private void registerAccount(GoogleSignInAccount acc) {
+
     }
 }
