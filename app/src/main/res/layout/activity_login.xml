@@ -27,8 +27,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:paddingTop="100dp"
-            android:paddingBottom="24dp"
-            android:onClick="signIn"/>
+            android:paddingBottom="24dp" />
 
     </LinearLayout>
 </ScrollView>
