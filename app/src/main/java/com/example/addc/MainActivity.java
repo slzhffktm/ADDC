@@ -3,9 +3,11 @@ package com.example.addc;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,6 +17,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -28,16 +33,31 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sharedPreferences = getApplicationContext().getSharedPreferences(APP_SHARED_PREFERENCES, Context.MODE_PRIVATE);
-        isUserLoggedIn = sharedPreferences.getBoolean("userLoggedInState", false);
-//        currentlyLoggedInUser = sharedPreferences.getInt("currentLoggedInUserId", 0);
-//        currentlyLoggedInUserString = Integer.toString(currentlyLoggedInUser);
-        if (!isUserLoggedIn) {
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        if (acct != null) {
+            String personName = acct.getDisplayName();
+            String personEmail = acct.getEmail();
+            String personId = acct.getId();
+            Uri personPhoto = acct.getPhotoUrl();
+
+            Log.w("PERSONNAME", personName + personEmail + personId + personPhoto);
+        } else {
             Intent intent = new Intent(this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
         }
+
+//        sharedPreferences = getApplicationContext().getSharedPreferences(APP_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+//        isUserLoggedIn = sharedPreferences.getBoolean("userLoggedInState", false);
+////        currentlyLoggedInUser = sharedPreferences.getInt("currentLoggedInUserId", 0);
+////        currentlyLoggedInUserString = Integer.toString(currentlyLoggedInUser);
+//        if (!isUserLoggedIn) {
+//            Intent intent = new Intent(this, LoginActivity.class);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            startActivity(intent);
+//            finish();
+//        }
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -64,9 +84,15 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onRestart() {
-        sharedPreferences = getApplicationContext().getSharedPreferences(APP_SHARED_PREFERENCES, Context.MODE_PRIVATE);
-        isUserLoggedIn = sharedPreferences.getBoolean("userLoggedInState", false);
-        if (!isUserLoggedIn) {
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        if (acct != null) {
+            String personName = acct.getDisplayName();
+            String personEmail = acct.getEmail();
+            String personId = acct.getId();
+            Uri personPhoto = acct.getPhotoUrl();
+
+            Log.w("PERSONNAME", personName + personEmail + personId + personPhoto);
+        } else {
             Intent intent = new Intent(this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
@@ -77,9 +103,15 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onResume() {
-        sharedPreferences = getApplicationContext().getSharedPreferences(APP_SHARED_PREFERENCES, Context.MODE_PRIVATE);
-        isUserLoggedIn = sharedPreferences.getBoolean("userLoggedInState", false);
-        if (!isUserLoggedIn) {
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        if (acct != null) {
+            String personName = acct.getDisplayName();
+            String personEmail = acct.getEmail();
+            String personId = acct.getId();
+            Uri personPhoto = acct.getPhotoUrl();
+
+            Log.w("PERSONNAME", personName + personEmail + personId + personPhoto);
+        } else {
             Intent intent = new Intent(this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
