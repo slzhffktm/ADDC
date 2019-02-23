@@ -6,6 +6,5 @@ public class Todo implements Serializable {
 
     private String name;
     private String description;
-    private String 
     private String deadline;
 }
