@@ -3,6 +3,9 @@ package com.example.addc;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,22 +17,34 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     GoogleSignInClient mGoogleSignInClient;
     SignInButton signInButton;
     private static int RC_SIGN_IN = 100;
 
+    private DatabaseReference mDatabase;
+
     private static final String APP_SHARED_PREFERENCES = "addc_preferences";
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     private boolean isUserLoggedIn;
+    private boolean isUserExist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FirebaseApp.initializeApp(this);
         setContentView(R.layout.activity_login);
 
         // Configure sign-in to request the user's ID, email address, and basic
@@ -42,17 +57,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         signInButton = findViewById(R.id.sign_in_button);
         signInButton.setOnClickListener(this);
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        // Check for existing Google Sign In account, if the user is already signed in
-        // the GoogleSignInAccount will be non-null.
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        updateUI(account);
-    }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//
+//        // Check for existing Google Sign In account, if the user is already signed in
+//        // the GoogleSignInAccount will be non-null.
+//        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+//        updateUI(account);
+//    }
 
     @Override
     public void onClick(View v) {
@@ -86,42 +103,74 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
 
             // Signed in successfully, show authenticated UI.
-            updateUI(account);
+            if (!isAccountRegistered(account)) {
+                registerAccount(account);
+            }
+
+            updateUI();
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w("LOGIN", "signInResult:failed code=" + e.getStatusCode());
-            updateUI(null);
+            Snackbar.make(findViewById(R.id.coordinatorLayout), "Authentication failed with code=" + e.getStatusCode(), Snackbar.LENGTH_LONG).show();
         }
     }
 
-    private void updateUI(GoogleSignInAccount acc) {
-        if (acc != null) {
-            if (!isAccountRegistered(acc)) {
-                registerAccount(acc);
-            }
-
-            Intent main = new Intent(this, MainActivity.class);
-            main.putExtra("reqFrom", "login");
-            startActivity(main);
-            finish();
-        } else {
-            signInButton.setVisibility(View.VISIBLE);
-        }
+    private void updateUI() {
+        Intent main = new Intent(this, MainActivity.class);
+        main.putExtra("reqFrom", "login");
+        startActivity(main);
+        finish();
     }
 
-    // TODO: check account exist in database
     private boolean isAccountRegistered(GoogleSignInAccount acc) {
-        String personName = acc.getDisplayName();
-        String personEmail = acc.getEmail();
-        String personId = acc.getId();
+        String userId = acc.getId();
 
         // check the account
-        return true;
+        mDatabase.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    isUserExist = true;
+                } else {
+                    isUserExist = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        return isUserExist;
     }
 
-    // TODO: implement register account
     private void registerAccount(GoogleSignInAccount acc) {
+        Snackbar.make(findViewById(R.id.coordinatorLayout), "Registering new account.", Snackbar.LENGTH_SHORT).show();
+
+        String userName = acc.getDisplayName();
+        String userEmail = acc.getEmail();
+        String userId = acc.getId();
+        String userPhoto = acc.getPhotoUrl().toString();
+
+        User user = new User(userId, userEmail, userName, userPhoto);
+
+        mDatabase.child("users").child(userId).setValue(user)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // Write was successful!
+                        Snackbar.make(findViewById(R.id.coordinatorLayout), "Register success.", Snackbar.LENGTH_LONG).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Write failed
+                        Snackbar.make(findViewById(R.id.coordinatorLayout), "Register failed. Try again.", Snackbar.LENGTH_LONG).show();
+                    }
+                });
 
     }
 }
