@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
     }
 
     @Override
@@ -173,7 +174,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.add_list) {
-            // Handle the camera action
+            goToSecondActivity();
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -214,5 +215,13 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
                 });
+    }
+
+    private void goToSecondActivity() {
+
+        Intent intent = new Intent(this, Tambah_matkul.class);
+
+        startActivity(intent);
+
     }
 }
