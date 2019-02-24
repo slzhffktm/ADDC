@@ -184,6 +184,11 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_send) {
 
+        } else if (id == R.id.nav_navigate) {
+            Log.w("ACTIVATE","Start NearestWorkshop Activity");
+            Intent intent = new Intent(MainActivity.this, NavigateNearestWorkshop.class);
+            startActivity(intent);
+            finish();
         } else if (id == R.id.nav_sign_out) {
             signOut();
         }
