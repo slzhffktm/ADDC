@@ -38,6 +38,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.addc.MainActivity" />
         </activity>
+        <activity android:name=".Tambah_matkul"></activity>
         <activity android:name=".LoginActivity" />
         <activity
             android:name=".MainActivity"
