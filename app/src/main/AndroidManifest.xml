@@ -9,7 +9,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Tambah_matkul"></activity>
+        <activity
+            android:name=".AddMatkul"
+            android:label="@string/title_activity_add_matkul"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity android:name=".LoginActivity" />
         <activity
             android:name=".MainActivity"

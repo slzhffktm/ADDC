@@ -221,7 +221,7 @@ public class MainActivity extends AppCompatActivity
 
     private void goToSecondActivity() {
 
-        Intent intent = new Intent(this, Tambah_matkul.class);
+        Intent intent = new Intent(this, AddMatkul.class);
 
         startActivity(intent);
 

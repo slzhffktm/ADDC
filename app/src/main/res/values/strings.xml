@@ -6,7 +6,16 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
-
     <string name="server_client_id">104571293708-2qf5b1f6ljf0fsjjfnh6htenv3vacq1c.apps.googleusercontent.coms</string>
+
+    <string-array name="matkul">
+        <item>IF3111-Pengembangan Aplikasi pada Platform Khusus</item>
+        <item>IF3230-Sistem Paralel dan Terdistribusi</item>
+        <item>IF3240-Sistem Informasi</item>
+        <item>IF3250-Proyek Perangkat Lunak</item>
+        <item>IF3260-Grafika Komputer</item>
+        <item>IF3280-Socio-informatika dan Profesionalisme</item>
+    </string-array>
+    <string name="title_activity_add_matkul">AddMatkul</string>
 
 </resources>
