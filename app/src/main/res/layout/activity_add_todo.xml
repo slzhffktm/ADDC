@@ -14,21 +14,6 @@
         android:paddingLeft="24dp"
         android:paddingRight="24dp">
 
-        <!--  Mata Kuliah  -->
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
-            <EditText android:id="@+id/input_matakuliah"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textCapWords"
-                android:hint="Mata Kuliah"
-                android:imeOptions="actionNext"/>
-        </android.support.design.widget.TextInputLayout>
-
-
         <!--  Name Label -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -41,6 +26,23 @@
                 android:inputType="textCapWords"
                 android:hint="Task Name"
                 android:imeOptions="actionNext"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <!--  Mata Kuliah Label -->
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+            <EditText android:id="@+id/input_matakuliah"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords"
+                android:clickable="true"
+                android:focusable="false"
+                android:hint="Mata Kuliah"
+                android:imeOptions="actionNext"
+                tools:ignore="KeyboardInaccessibleWidget" />
         </android.support.design.widget.TextInputLayout>
 
         <!-- Description Label -->
