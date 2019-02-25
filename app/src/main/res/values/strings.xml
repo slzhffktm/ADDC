@@ -17,5 +17,6 @@
         <item>IF3280-Socio-informatika dan Profesionalisme</item>
     </string-array>
     <string name="title_activity_add_matkul">AddMatkul</string>
+    <string name="delete_matkul">Delete</string>
 
 </resources>
