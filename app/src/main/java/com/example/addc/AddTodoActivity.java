@@ -35,7 +35,7 @@ import java.util.Locale;
 import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
 import in.galaxyofandroid.spinerdialog.SpinnerDialog;
 
-// TODO: 2/25/2019 CREATE FOR EDIT 
+// TODO: 2/25/2019 CREATE FOR EDIT
 public class AddTodoActivity extends AppCompatActivity {
     final Calendar calendar = Calendar.getInstance();
 
