@@ -16,6 +16,7 @@ import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -261,7 +262,8 @@ public class AddTodoActivity extends AppCompatActivity {
                             mDatabase.child("todo_users").child(todoId).child(user.getId()).setValue(true);
                         }
 
-                        Snackbar.make(findViewById(R.id.addTodoCoordinatorLayout), "Success.", Snackbar.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Success.",
+                                Toast.LENGTH_SHORT).show();
 
                         Intent intent = new Intent(AddTodoActivity.this, TodoListActivity.class);
                         startActivity(intent);
@@ -270,7 +272,7 @@ public class AddTodoActivity extends AppCompatActivity {
                 .addOnCanceledListener(new OnCanceledListener() {
                     @Override
                     public void onCanceled() {
-                        Snackbar.make(findViewById(R.id.addTodoCoordinatorLayout), "No internet connection.", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(findViewById(R.id.todoListCoordinatorLayout), "No internet connection.", Snackbar.LENGTH_SHORT).show();
                     }
                 });
     }

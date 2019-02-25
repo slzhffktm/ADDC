@@ -2,6 +2,7 @@ package com.example.addc;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -17,10 +20,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+
 public class TodoListActivity extends AppCompatActivity {
 
+    GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+    String yourId = acct.getId();
+
+    ArrayList<String> todoIds = new ArrayList<>();
+    ArrayList<String> todoTexts = new ArrayList<>();
+
     private DatabaseReference mDatabase;
-    private ValueEventListener mListener;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,25 +56,29 @@ public class TodoListActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        ValueEventListener listener = new ValueEventListener() {
+
+    }
+
+    protected void getTodos() {
+        mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Todo todo = dataSnapshot.getValue(Todo.class);
-                // [START_EXCLUDE]
-//                mAuthorView.setText(post.author);
-//                mTitleView.setText(post.title);
-//                mBodyView.setText(post.body);
-                // [END_EXCLUDE]
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds: dataSnapshot.child("user_todos").child(yourId).getChildren()) {
+                    String id = ds.getKey();
+                    String name = dataSnapshot.child("todos").child(id).child("name").getValue().toString();
+                    String dueDate = dataSnapshot.child("todos").child(id).child("dueDate").getValue().toString();
+
+                    todoIds.add(id);
+                    todoTexts.add(dueDate + " " + name);
+                }
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.w("TODO", "loadPost:onCancelled", databaseError.toException());
-                // [START_EXCLUDE]
-                Toast.makeText(TodoListActivity.this, "Failed to load post.",
-                        Toast.LENGTH_SHORT).show();
-                // [END_EXCLUDE]
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Snackbar.make(findViewById(R.id.addTodoCoordinatorLayout), "No internet connection.", Snackbar.LENGTH_SHORT).show();
             }
-        };
+        });
+
+
     }
 }
