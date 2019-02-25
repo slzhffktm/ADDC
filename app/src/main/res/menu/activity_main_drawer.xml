@@ -9,6 +9,10 @@
             android:icon="@drawable/ic_menu_workspace"
             android:title="Nearest Workspace" />
         <item
+            android:id="@+id/nav_track"
+            android:icon="@drawable/ic_menu_track"
+            android:title="Track Them!" />
+        <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_menu_camera"
             android:title="Import" />

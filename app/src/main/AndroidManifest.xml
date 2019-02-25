@@ -36,7 +36,8 @@
 
         <activity
             android:name=".TrackFriends"
-            android:label="@string/title_activity_track_friends">
+            android:label="@string/title_activity_track_friends"
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.addc.MainActivity" />

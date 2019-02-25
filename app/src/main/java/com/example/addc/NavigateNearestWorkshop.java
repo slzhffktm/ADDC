@@ -267,7 +267,7 @@ public class NavigateNearestWorkshop extends AppCompatActivity implements OnMapR
 
                                     ArrayList<LatLng> directionPositionList = leg.getDirectionPoint();
                                     PolylineOptions polylineOptions = DirectionConverter.createPolyline(NavigateNearestWorkshop.this, directionPositionList, 5, Color.RED);
-                                    mMap.addPolyline(polylineOptions);
+//                                    mMap.addPolyline(polylineOptions);
                                 } else {
 
                                 }
