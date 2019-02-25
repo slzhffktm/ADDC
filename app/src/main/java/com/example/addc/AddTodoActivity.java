@@ -3,7 +3,6 @@ package com.example.addc;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -262,7 +261,7 @@ public class AddTodoActivity extends AppCompatActivity {
                             mDatabase.child("todo_users").child(todoId).child(user.getId()).setValue(true);
                         }
 
-                        Toast.makeText(getApplicationContext(), "Success.",
+                        Toast.makeText(AddTodoActivity.this, "Success.",
                                 Toast.LENGTH_SHORT).show();
 
                         Intent intent = new Intent(AddTodoActivity.this, TodoListActivity.class);
@@ -272,7 +271,7 @@ public class AddTodoActivity extends AppCompatActivity {
                 .addOnCanceledListener(new OnCanceledListener() {
                     @Override
                     public void onCanceled() {
-                        Snackbar.make(findViewById(R.id.todoListCoordinatorLayout), "No internet connection.", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(findViewById(R.id.addTodoCoordinatorLayout), "No internet connection.", Snackbar.LENGTH_SHORT).show();
                     }
                 });
     }

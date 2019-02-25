@@ -31,23 +31,4 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:fitsSystemWindows="true">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:id="@+id/checkbox_container"
-            android:paddingLeft="12dp"
-            android:paddingTop="20dp"
-            android:paddingRight="12dp">
-
-
-        </LinearLayout>
-    </ScrollView>
-
 </android.support.design.widget.CoordinatorLayout>
