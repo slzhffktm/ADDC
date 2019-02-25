@@ -2,11 +2,16 @@ package com.example.addc;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -21,6 +26,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -30,6 +37,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
+
+import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
@@ -45,6 +54,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FirebaseApp.initializeApp(this);
+        setContentView(R.layout.activity_main);
 
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         if (acct != null) {
@@ -61,6 +71,8 @@ public class MainActivity extends AppCompatActivity
             finish();
         }
 
+
+
 //        sharedPreferences = getApplicationContext().getSharedPreferences(APP_SHARED_PREFERENCES, Context.MODE_PRIVATE);
 //        isUserLoggedIn = sharedPreferences.getBoolean("userLoggedInState", false);
 ////        currentlyLoggedInUser = sharedPreferences.getInt("currentLoggedInUserId", 0);
@@ -72,7 +84,6 @@ public class MainActivity extends AppCompatActivity
 //            finish();
 //
 
-        setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -168,6 +179,25 @@ public class MainActivity extends AppCompatActivity
 
 //        unregisterReceiver();
     }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        SharedPreferences pref = getSharedPreferences("MyPreference",MODE_PRIVATE);
+
+        NavigationView nav_bar = (NavigationView)findViewById(R.id.nav_view);
+        View headerView = nav_bar.getHeaderView(0);
+        TextView tv_id = (TextView)headerView.findViewById(R.id.userID);
+        tv_id.setText(pref.getString("name","Android Studio"));
+
+        TextView tv_email = (TextView)headerView.findViewById(R.id.userEmail);
+        tv_email.setText(pref.getString("email","android.studio@gmail.com"));
+
+        new DownloadImageTask((ImageView)headerView.findViewById(R.id.userPhoto))
+                .execute(pref.getString("photo",null));
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -293,4 +323,30 @@ public class MainActivity extends AppCompatActivity
         Toast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
     }
 
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
+    }
+
 }
+
