@@ -22,6 +22,14 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <service
+            android:name=".RecieveNotificationService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service
             android:name=".TrackingService"
             android:enabled="true"
             android:exported="true" />
@@ -48,7 +56,30 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.addc.MainActivity" />
         </activity>
-        <activity android:name=".Tambah_matkul" />
+        <activity
+            android:name=".AddMatkul"
+            android:label="@string/title_activity_add_matkul"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <service
+            android:name=".TrackingService"
+            android:enabled="true"
+            android:exported="true" />
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/.
+        -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBoKM22Gt7W3vtvLIy9vzj0LlDdKnuOl-Q" />
+
         <activity android:name=".LoginActivity" />
         <activity
             android:name=".MainActivity"
