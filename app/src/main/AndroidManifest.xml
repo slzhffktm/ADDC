@@ -9,8 +9,9 @@
          location permissions for the 'MyLocation' functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="true"
@@ -20,7 +21,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
+        <service
+            android:name=".TrackingService"
+            android:enabled="true"
+            android:exported="true" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -34,17 +38,16 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBoKM22Gt7W3vtvLIy9vzj0LlDdKnuOl-Q"/>
+            android:value="AIzaSyBoKM22Gt7W3vtvLIy9vzj0LlDdKnuOl-Q" />
 
         <activity
             android:name=".NavigateNearestWorkshop"
             android:label="@string/title_activity_navigate_nearest_workshop"
-            android:parentActivityName="com.example.addc.MainActivity">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.addc.MainActivity" />
         </activity>
-
         <activity android:name=".Tambah_matkul" />
         <activity android:name=".LoginActivity" />
         <activity
