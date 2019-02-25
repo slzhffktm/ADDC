@@ -6,6 +6,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -41,14 +45,20 @@ import com.google.firebase.FirebaseApp;
 import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, SensorEventListener {
 
-    //    private static final String APP_SHARED_PREFERENCES = "addc_preferences";
-//    SharedPreferences sharedPreferences;
-//    SharedPreferences.Editor editor;
-//    private boolean isUserLoggedIn;
     GoogleSignInClient mGoogleSignInClient;
     private static final int PERMISSIONS_REQUEST = 100;
+    SensorManager sensorManager;
+    Sensor accelerometer;
+
+
+    private static final float SHAKE_THRESHOLD_GRAVITY = 2.7F;
+    private static final int SHAKE_SLOP_TIME_MS = 500;
+    private static final int SHAKE_COUNT_RESET_TIME_MS = 3000;
+
+    private long mShakeTimestamp;
+    private int mShakeCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,18 +81,9 @@ public class MainActivity extends AppCompatActivity
             finish();
         }
 
-
-
-//        sharedPreferences = getApplicationContext().getSharedPreferences(APP_SHARED_PREFERENCES, Context.MODE_PRIVATE);
-//        isUserLoggedIn = sharedPreferences.getBoolean("userLoggedInState", false);
-////        currentlyLoggedInUser = sharedPreferences.getInt("currentLoggedInUserId", 0);
-////        currentlyLoggedInUserString = Integer.toString(currentlyLoggedInUser);
-//        if (!isUserLoggedIn) {
-//            Intent intent = new Intent(this, LoginActivity.class);
-//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            startActivity(intent);
-//            finish();
-//
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -171,12 +172,13 @@ public class MainActivity extends AppCompatActivity
             finish();
         }
         super.onResume();
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
+        sensorManager.unregisterListener(this);
 //        unregisterReceiver();
     }
 
@@ -184,18 +186,18 @@ public class MainActivity extends AppCompatActivity
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-        SharedPreferences pref = getSharedPreferences("MyPreference",MODE_PRIVATE);
+        SharedPreferences pref = getSharedPreferences("MyPreference", MODE_PRIVATE);
 
-        NavigationView nav_bar = (NavigationView)findViewById(R.id.nav_view);
+        NavigationView nav_bar = (NavigationView) findViewById(R.id.nav_view);
         View headerView = nav_bar.getHeaderView(0);
-        TextView tv_id = (TextView)headerView.findViewById(R.id.userID);
-        tv_id.setText(pref.getString("name","Android Studio"));
+        TextView tv_id = (TextView) headerView.findViewById(R.id.userID);
+        tv_id.setText(pref.getString("name", "Android Studio"));
 
-        TextView tv_email = (TextView)headerView.findViewById(R.id.userEmail);
-        tv_email.setText(pref.getString("email","android.studio@gmail.com"));
+        TextView tv_email = (TextView) headerView.findViewById(R.id.userEmail);
+        tv_email.setText(pref.getString("email", "android.studio@gmail.com"));
 
-        new DownloadImageTask((ImageView)headerView.findViewById(R.id.userPhoto))
-                .execute(pref.getString("photo",null));
+        new DownloadImageTask((ImageView) headerView.findViewById(R.id.userPhoto))
+                .execute(pref.getString("photo", null));
     }
 
 
@@ -250,7 +252,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_send) {
 
         } else if (id == R.id.nav_navigate) {
-            Log.w("ACTIVATE","Start NearestWorkshop Activity");
+            Log.w("ACTIVATE", "Start NearestWorkshop Activity");
             Intent intent = new Intent(MainActivity.this, NavigateNearestWorkshop.class);
             startActivity(intent);
             finish();
@@ -315,6 +317,44 @@ public class MainActivity extends AppCompatActivity
         startService(new Intent(this, TrackingService.class));
         //Notify the user that tracking has been enabled//
         Toast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        float x = event.values[0];
+        float y = event.values[1];
+        float z = event.values[2];
+
+        float gX = x / SensorManager.GRAVITY_EARTH;
+        float gY = y / SensorManager.GRAVITY_EARTH;
+        float gZ = z / SensorManager.GRAVITY_EARTH;
+
+        // gForce will be close to 1 when there is no movement.
+        float gForce = (float) Math.sqrt(gX * gX + gY * gY + gZ * gZ);
+
+        if (gForce > SHAKE_THRESHOLD_GRAVITY) {
+            final long now = System.currentTimeMillis();
+            // ignore shake events too close to each other (500ms)
+            if (mShakeTimestamp + SHAKE_SLOP_TIME_MS > now) {
+                return;
+            }
+
+            // reset the shake count after 3 seconds of no shakes
+            if (mShakeTimestamp + SHAKE_COUNT_RESET_TIME_MS < now) {
+                mShakeCount = 0;
+            }
+
+            mShakeTimestamp = now;
+            mShakeCount++;
+
+            Log.w("working", "shakeshake");
+        }
+
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
