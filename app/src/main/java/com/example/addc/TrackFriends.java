@@ -207,14 +207,19 @@ public class TrackFriends extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        Log.d("SUCCESS", "Adapter");
+
         // Prompt the user for permission.
         getLocationPermission();
+        Log.d("SUCCESS", "Permission granted");
 
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
+        Log.d("SUCCESS", "Update Location UI");
 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
+        Log.d("SUCCESS", "Get current location");
 
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(TrackFriends.this);
         Log.d("FirebaseUser", "onLocationResult: "+acct);
@@ -225,18 +230,39 @@ public class TrackFriends extends FragmentActivity implements OnMapReadyCallback
         mDatabase.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                for (DataSnapshot users : dataSnapshot.child("user_todos").getChildren()) {
-                    if (users.getKey() == personId) {
-                        User user;
-                        user = dataSnapshot.child("users").child(users.getKey()).getValue(User.class);
-                        Log.d("Name", user.getName());
-                        LatLng location = new LatLng(user.getLatitude(), user.getLongitude());
-                        Marker m = mMap.addMarker(new MarkerOptions()
-                                .position(location)
-                                .title(user.getName())
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                for (DataSnapshot projects : dataSnapshot.child("user_todos").getChildren()) {
+                    Log.d("Tes", "here");
+                    Log.d("Tes", projects.getKey());
+                    for (DataSnapshot users : dataSnapshot.child("todo_users").getChildren()) {
+                        if (users.getKey() != personId) {
+                            User user;
+                            user = dataSnapshot.child("users").child(users.getKey()).getValue(User.class);
+                            Log.d("Name", user.getName());
+                            LatLng location = new LatLng(user.getLatitude(), user.getLongitude());
+                            Log.d("Tes","Snippet "+String.valueOf(dataSnapshot.child("todos").child(projects.getKey()).child("name")));
+                            Marker m = mMap.addMarker(new MarkerOptions()
+                                    .position(location)
+                                    .title(user.getName())
+                                    .snippet(String.valueOf(dataSnapshot.child("todos").child(projects.getKey()).child("name")))
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                        }
                     }
                 }
+
+//                for (DataSnapshot users : dataSnapshot.getChildren()) {
+//                    Log.d("Tes", "here");
+//                    Log.d("Tes", users.getKey());
+//                    if (users.getKey() == personId) {
+//                        User user;
+//                        user = dataSnapshot.child("users").child(users.getKey()).getValue(User.class);
+//                        Log.d("Name", user.getName());
+//                        LatLng location = new LatLng(user.getLatitude(), user.getLongitude());
+//                        Marker m = mMap.addMarker(new MarkerOptions()
+//                                .position(location)
+//                                .title(user.getName())
+//                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+//                    }
+//                }
             }
 
             @Override

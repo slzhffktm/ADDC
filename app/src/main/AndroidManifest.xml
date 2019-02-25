@@ -42,6 +42,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.addc.MainActivity" />
         </activity>
+        <activity android:name=".AddTodoActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.addc.TodoListActivity" />
+        </activity>
+        <activity
+            android:name=".TodoListActivity"
+            android:label="@string/title_activity_todo_list"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <service
             android:name=".TrackingService"

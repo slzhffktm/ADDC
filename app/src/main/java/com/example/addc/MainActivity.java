@@ -231,6 +231,9 @@ public class MainActivity extends AppCompatActivity
             finish();
         } else if (id == R.id.nav_sign_out) {
             signOut();
+        } else if (id == R.id.nav_todo) {
+            Intent intent = new Intent(this, TodoListActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
