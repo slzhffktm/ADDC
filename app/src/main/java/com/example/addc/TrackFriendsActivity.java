@@ -1,14 +1,14 @@
 package com.example.addc;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
+import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.akexorcist.googledirection.DirectionCallback;
@@ -17,11 +17,13 @@ import com.akexorcist.googledirection.constant.TransportMode;
 import com.akexorcist.googledirection.model.Direction;
 import com.akexorcist.googledirection.model.Leg;
 import com.akexorcist.googledirection.model.Route;
-import com.akexorcist.googledirection.util.DirectionConverter;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.PlaceDetectionClient;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -31,8 +33,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
@@ -43,9 +43,9 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
-public class NavigateNearestWorkshop extends AppCompatActivity implements OnMapReadyCallback {
+public class TrackFriendsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    private static final String TAG = NavigateNearestWorkshop.class.getSimpleName();
+    private static final String TAG = TrackFriendsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
 
@@ -74,15 +74,19 @@ public class NavigateNearestWorkshop extends AppCompatActivity implements OnMapR
     // Firebase instantiation
     private DatabaseReference mDatabase;
 
+    private String todoId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Intent
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            todoId = extras.getString("todo_id");
+        }
+
         super.onCreate(savedInstanceState);
-//        if (savedInstanceState != null) {
-//            mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-//            mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
-//        }
-//        setHasOptionsMenu(true);
-        setContentView(R.layout.activity_navigate_nearest_workshop);
+
+        setContentView(R.layout.activity_track_friends);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -100,7 +104,7 @@ public class NavigateNearestWorkshop extends AppCompatActivity implements OnMapR
         Log.d("SUCCESS", "Created map");
 
         mDatabase =
-                FirebaseDatabase.getInstance().getReference().child("workspace");
+                FirebaseDatabase.getInstance().getReference();
     }
 
     private void getLocationPermission() {
@@ -150,61 +154,52 @@ public class NavigateNearestWorkshop extends AppCompatActivity implements OnMapR
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Use a custom info window adapter to handle multiple lines of text in the
-        // info window contents.
-//        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-//
-//            @Override
-//            // Return null here, so that getInfoContents() is called next.
-//            public View getInfoWindow(Marker arg0) {
-//                return null;
-//            }
-//
-//            @Override
-//            public View getInfoContents(Marker marker) {
-//                // Inflate the layouts for the info window, title and snippet.
-//                View infoWindow = getLayoutInflater().inflate(R.layout.custom_info_contents,
-//                        (FrameLayout) findViewById(R.id.map), false);
-//
-//                TextView title = ((TextView) infoWindow.findViewById(R.id.title));
-//                title.setText(marker.getTitle());
-//
-//                TextView snippet = ((TextView) infoWindow.findViewById(R.id.snippet));
-//                snippet.setText(marker.getSnippet());
-//
-//                return infoWindow;
-//            }
-//        });
         Log.d("SUCCESS", "Adapter");
 
         // Prompt the user for permission.
         getLocationPermission();
         Log.d("SUCCESS", "Permission granted");
 
-
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
         Log.d("SUCCESS", "Update Location UI");
-
 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
         Log.d("SUCCESS", "Get current location");
 
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("workspace");
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(TrackFriendsActivity.this);
+        Log.d("FirebaseUser", "onLocationResult: "+acct);
+        final String personId = acct.getId();
 
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        if (todoId == null) {
+            todoId = mDatabase.child(personId).getKey();
+        }
+        Log.d("Tes", "onMapReady: todoid "+todoId);
         mDatabase.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Workspace workspace;
-                workspace = dataSnapshot.getValue(Workspace.class);
-                Log.d("Name", workspace.getName());
-                LatLng location = new LatLng(workspace.getLatitude(), workspace.getLongitude());
-                Marker m = mMap.addMarker(new MarkerOptions()
-                        .position(location)
-                        .title(workspace.getName())
-                        .snippet(workspace.getAddress()+"\n"+workspace.getPhone())
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                Log.d("Tes", "Todo id: "+todoId);
+                if (dataSnapshot.child("todo_users").child(todoId).getChildrenCount() != 0) {
+                    for (DataSnapshot users : dataSnapshot.child("todo_users").child(todoId).getChildren()) {
+                        Log.d("Tes", "here");
+                        Log.d("Tes", "Key: " + users.getKey());
+                        if (users.getKey() != personId) {
+                            User user;
+                            user = dataSnapshot.child("users").child(users.getKey()).getValue(User.class);
+                            Log.d("Name", user.getName());
+                            LatLng location = new LatLng(user.getLatitude(), user.getLongitude());
+                            Log.d("Tes",String.valueOf(dataSnapshot.child("todos").child(todoId).child("name")));
+                            Marker m = mMap.addMarker(new MarkerOptions()
+                                    .position(location)
+                                    .title(user.getName())
+                                    .snippet(String.valueOf(dataSnapshot.child("todos").child(todoId).child("name")))
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                        }
+                    }
+                }
             }
 
             @Override
@@ -265,9 +260,7 @@ public class NavigateNearestWorkshop extends AppCompatActivity implements OnMapR
                                     Route route = direction.getRouteList().get(0);
                                     Leg leg = route.getLegList().get(0);
 
-                                    ArrayList<LatLng> directionPositionList = leg.getDirectionPoint();
-                                    PolylineOptions polylineOptions = DirectionConverter.createPolyline(NavigateNearestWorkshop.this, directionPositionList, 5, Color.RED);
-//                                    mMap.addPolyline(polylineOptions);
+//                                    ArrayList<LatLng> directionPositionList = leg.getDirectionPoint();
                                 } else {
 
                                 }

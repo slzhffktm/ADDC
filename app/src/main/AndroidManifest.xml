@@ -22,6 +22,28 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
+        <activity
+            android:name=".TrackFriendsActivity"
+            android:label="Map"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.addc.MainActivity" />
+        </activity>
+
+        <activity android:name=".AddTodoActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.addc.TodoListActivity" />
+        </activity>
+
+        <activity
+            android:name=".TodoListActivity"
+            android:label="@string/title_activity_todo_list"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <service
             android:name=".RecieveNotificationService"
             android:enabled="true"
@@ -46,9 +68,6 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBoKM22Gt7W3vtvLIy9vzj0LlDdKnuOl-Q" />
 
         <activity
             android:name=".NavigateNearestWorkshop"

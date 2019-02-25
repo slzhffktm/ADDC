@@ -9,6 +9,10 @@
             android:icon="@drawable/ic_menu_workspace"
             android:title="Nearest Workspace" />
         <item
+            android:id="@+id/nav_track"
+            android:icon="@drawable/ic_menu_track"
+            android:title="Track Them!" />
+        <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_menu_camera"
             android:title="Import" />
@@ -16,6 +20,10 @@
             android:id="@+id/add_list"
             android:icon="@drawable/ic_add_list"
             android:title="Tambah mata kuliah" />
+        <item
+            android:id="@+id/nav_todo"
+            android:icon="@drawable/todo"
+            android:title="To-do List" />
         <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_gallery"
@@ -32,6 +40,7 @@
             android:id="@+id/nav_sign_out"
             android:icon="@drawable/sign_out"
             android:title="Sign Out" />
+
     </group>
 
     <item android:title="Communicate">

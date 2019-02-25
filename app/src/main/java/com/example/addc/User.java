@@ -11,9 +11,11 @@ public class User implements Serializable {
     private String name;
     private String picture;
     private MataKuliah[] mataKuliahs;
+    private double latitude;
+    private double longitude;
 
     public User() {
-        // Default constructor required for calls to DataSnapshot.getValue(Post.class)
+        // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
     public User(String id, String email, String name, String picture) {
@@ -21,6 +23,33 @@ public class User implements Serializable {
         this.email = email;
         this.name = name;
         this.picture = picture;
+        this.longitude = 0;
+        this.latitude = 0;
+    }
+
+    public User(String id, String email, String name, String picture, double latitude, double longitude) {
+        this.id = id;
+        this.email = email;
+        this.name = name;
+        this.picture = picture;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     public String getId() {
@@ -53,14 +82,6 @@ public class User implements Serializable {
 
     public void setPicture(String picture) {
         this.picture = picture;
-    }
-
-    public MataKuliah[] getMataKuliahs() {
-        return mataKuliahs;
-    }
-
-    public void setMataKuliahs(MataKuliah[] mataKuliahs) {
-        this.mataKuliahs = mataKuliahs;
     }
 
     public HashMap<String,String> toFirebaseObject() {
