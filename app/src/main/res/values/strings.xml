@@ -10,6 +10,9 @@
     <string name="title_activity_todo_list">TodoListActivity</string>
     <string name="title_activity_navigate_nearest_workshop">Map</string>
 
+    <string name="title_activity_add_matkul">AddMatkul</string>
+    <string name="delete_matkul">Delete</string>
+
     <string name="title_activity_maps">Current Place Details</string>
     <string name="default_info_title">Default Location</string>
     <string name="default_info_snippet">No places found, because location permission is disabled.</string>
@@ -18,4 +21,5 @@
     <string name="app_name">ADDC</string>
     <string name="tracking_enabled_notif">Tracking is currently enabled. Tap to cancel.</string>
     <string name="title_activity_track_friends">Map</string>
+
 </resources>
