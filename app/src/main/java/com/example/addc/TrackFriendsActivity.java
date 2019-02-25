@@ -86,7 +86,7 @@ public class TrackFriendsActivity extends FragmentActivity implements OnMapReady
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_navigate_nearest_workshop);
+        setContentView(R.layout.activity_track_friends);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -260,7 +260,7 @@ public class TrackFriendsActivity extends FragmentActivity implements OnMapReady
                                     Route route = direction.getRouteList().get(0);
                                     Leg leg = route.getLegList().get(0);
 
-                                    ArrayList<LatLng> directionPositionList = leg.getDirectionPoint();
+//                                    ArrayList<LatLng> directionPositionList = leg.getDirectionPoint();
                                 } else {
 
                                 }
