@@ -16,4 +16,5 @@
     <string name="pick_place">Choose a place</string>
     <string name="app_name">ADDC</string>
     <string name="tracking_enabled_notif">Tracking is currently enabled. Tap to cancel.</string>
+    <string name="title_activity_track_friends">Map</string>
 </resources>
