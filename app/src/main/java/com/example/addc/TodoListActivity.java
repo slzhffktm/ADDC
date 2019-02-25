@@ -129,6 +129,14 @@ public class TodoListActivity extends AppCompatActivity {
                     getTodos();
                 }
             });
+            checkBox.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    Intent intent = new Intent(TodoListActivity.this, TrackFriends.this);
+                    intent.putExtra("todo_id", undoneTodoIds.get(v.getId()));
+                    return false;
+                }
+            });
         }
         Log.w("UKURAN", String.format("%d", doneTodoTexts.size()));
 
