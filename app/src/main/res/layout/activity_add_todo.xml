@@ -97,9 +97,29 @@
             <EditText android:id="@+id/input_users"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="false"
                 android:inputType="textAutoComplete"
-                android:hint="Users"/>
+                android:hint="Group"
+                android:text="Total friends: 0"
+                tools:ignore="KeyboardInaccessibleWidget" />
         </android.support.design.widget.TextInputLayout>
+
+        <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="You"
+            android:checked="true"
+            android:enabled="false"/>
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/users_checkbox_container"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+        </LinearLayout>
 
         <!-- Submit Button -->
         <android.support.v7.widget.AppCompatButton

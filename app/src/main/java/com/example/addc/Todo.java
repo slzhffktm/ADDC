@@ -8,7 +8,7 @@ public class Todo implements Serializable {
     private String description;
     private String dueDate;
     private String dueTime;
-    private MataKuliah mataKuliah;
+    private String mataKuliahId;
     private User[] users;
     private boolean done;
 
@@ -16,12 +16,12 @@ public class Todo implements Serializable {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Todo(String name, String description, String dueDate, String dueTime, MataKuliah mataKuliah, User[] users, boolean done) {
+    public Todo(String name, String description, String dueDate, String dueTime, String mataKuliahId, User[] users, boolean done) {
         this.name = name;
         this.description = description;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
-        this.mataKuliah = mataKuliah;
+        this.mataKuliahId = mataKuliahId;
         this.users = users;
         this.done = done;
     }
@@ -42,20 +42,28 @@ public class Todo implements Serializable {
         this.description = description;
     }
 
+    public String getDueDate() {
+        return dueDate;
+    }
+
     public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public String getDueTime() {
+        return dueTime;
     }
 
     public void setDueTime(String dueTime) {
         this.dueTime = dueTime;
     }
 
-    public MataKuliah getMataKuliah() {
-        return mataKuliah;
+    public String getMataKuliahId() {
+        return mataKuliahId;
     }
 
-    public void setMataKuliah(MataKuliah mataKuliah) {
-        this.mataKuliah = mataKuliah;
+    public void setMataKuliahId(String mataKuliahId) {
+        this.mataKuliahId = mataKuliahId;
     }
 
     public User[] getUsers() {
