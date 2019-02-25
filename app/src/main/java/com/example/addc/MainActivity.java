@@ -41,8 +41,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, SensorEventListener {
@@ -59,6 +66,8 @@ public class MainActivity extends AppCompatActivity
 
     private long mShakeTimestamp;
     private int mShakeCount;
+
+    TextView task;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +89,8 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
             finish();
         }
+
+        task = findViewById(R.id.task);
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -242,7 +253,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.add_list) {
             goToSecondActivity();
         } else if (id == R.id.nav_track) {
-            Log.w("ACTIVATE","Start NearestWorkshop Activity");
+            Log.w("ACTIVATE", "Start NearestWorkshop Activity");
             Intent intent = new Intent(MainActivity.this, TrackFriendsActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_navigate) {
@@ -342,6 +353,43 @@ public class MainActivity extends AppCompatActivity
 
             mShakeTimestamp = now;
             mShakeCount++;
+            Log.w("JALAN", "shakeshake");
+
+            if (mShakeCount == 3) {
+                DatabaseReference todoDatabase = FirebaseDatabase.getInstance().getReference();
+
+                todoDatabase.addValueEventListener(new ValueEventListener() {
+
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        ArrayList<String> todos = new ArrayList<>();
+
+                        SharedPreferences pref = getSharedPreferences("MyPreference", MODE_PRIVATE);
+
+                        for (DataSnapshot ds: dataSnapshot.child("user_todos").child(pref.getString("id", null)).getChildren()) {
+                            String id = ds.getKey();
+                            String name = dataSnapshot.child("todos").child(id).child("name").getValue().toString();
+                            Boolean done = Boolean.parseBoolean(dataSnapshot.child("todos").child(id).child("done").getValue().toString());
+
+                            if (!done) {
+                                todos.add(name);
+                            }
+                        }
+
+
+                        Random random = new Random();
+                        int index = random.nextInt(todos.size());
+
+                        task.setText(todos.get(index));
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Snackbar.make(findViewById(R.id.addTodoCoordinatorLayout), "No internet connection.", Snackbar.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
 
             Log.w("working", "shakeshake");
         }
