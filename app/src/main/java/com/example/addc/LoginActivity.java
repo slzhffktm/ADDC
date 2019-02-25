@@ -35,9 +35,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private DatabaseReference mDatabase;
 
-    private static final String APP_SHARED_PREFERENCES = "addc_preferences";
+    //private static final String APP_SHARED_PREFERENCES = "addc_preferences";
     SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
+
+
     private boolean isUserLoggedIn;
     private boolean isUserExist;
 
@@ -107,6 +108,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 registerAccount(account);
             }
 
+            GoogleSignInAccount acc = GoogleSignIn.getLastSignedInAccount(this);
+            String personName = acc.getDisplayName();
+            String personEmail = acc.getEmail();
+            String personId = acc.getId();
+            Uri personPhoto = acc.getPhotoUrl();
+
+
+            SharedPreferences.Editor editor = getSharedPreferences("MyPreference",MODE_PRIVATE).edit();
+            editor.putString("name",personName);
+            editor.putString("email",personEmail);
+            editor.putString("id",personId);
+            editor.putString("photo",personPhoto.toString());
+            editor.apply();
+
+
+
             updateUI();
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
@@ -117,6 +134,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void updateUI() {
+
         Intent main = new Intent(this, MainActivity.class);
         main.putExtra("reqFrom", "login");
         startActivity(main);
