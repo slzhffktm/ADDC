@@ -22,6 +22,14 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <service
+            android:name=".RecieveNotificationService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service
             android:name=".TrackingService"
             android:enabled="true"
             android:exported="true" />
@@ -48,13 +56,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.addc.MainActivity" />
         </activity>
-
         <activity
             android:name=".AddMatkul"
             android:label="@string/title_activity_add_matkul"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <service
             android:name=".TrackingService"
