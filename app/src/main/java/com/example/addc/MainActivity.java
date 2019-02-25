@@ -213,7 +213,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_track) {
             Log.w("ACTIVATE","Start NearestWorkshop Activity");
-            Intent intent = new Intent(MainActivity.this, TrackFriends.class);
+            Intent intent = new Intent(MainActivity.this, TrackFriendsActivity.class);
             startActivity(intent);
             finish();
         } else if (id == R.id.nav_slideshow) {

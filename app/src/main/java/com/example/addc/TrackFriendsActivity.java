@@ -1,7 +1,7 @@
 package com.example.addc;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,7 +17,6 @@ import com.akexorcist.googledirection.constant.TransportMode;
 import com.akexorcist.googledirection.model.Direction;
 import com.akexorcist.googledirection.model.Leg;
 import com.akexorcist.googledirection.model.Route;
-import com.akexorcist.googledirection.util.DirectionConverter;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -34,7 +33,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
@@ -45,9 +43,9 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
-public class TrackFriends extends FragmentActivity implements OnMapReadyCallback {
+public class TrackFriendsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    private static final String TAG = TrackFriends.class.getSimpleName();
+    private static final String TAG = TrackFriendsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
 
@@ -76,8 +74,16 @@ public class TrackFriends extends FragmentActivity implements OnMapReadyCallback
     // Firebase instantiation
     private DatabaseReference mDatabase;
 
+    private String todoId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Intent
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            todoId = extras.getString("todo_id");
+        }
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_navigate_nearest_workshop);
@@ -221,7 +227,7 @@ public class TrackFriends extends FragmentActivity implements OnMapReadyCallback
         getDeviceLocation();
         Log.d("SUCCESS", "Get current location");
 
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(TrackFriends.this);
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(TrackFriendsActivity.this);
         Log.d("FirebaseUser", "onLocationResult: "+acct);
         final String personId = acct.getId();
 
@@ -230,24 +236,44 @@ public class TrackFriends extends FragmentActivity implements OnMapReadyCallback
         mDatabase.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                for (DataSnapshot projects : dataSnapshot.child("user_todos").getChildren()) {
-                    Log.d("Tes", "here");
-                    Log.d("Tes", projects.getKey());
-                    for (DataSnapshot users : dataSnapshot.child("todo_users").getChildren()) {
+                Log.d("Tes", "Todo id: "+todoId);
+                if (dataSnapshot.child("todo_users").child(todoId).getChildrenCount() != 0) {
+                    for (DataSnapshot users : dataSnapshot.child("todo_users").child(todoId).getChildren()) {
+                        Log.d("Tes", "here");
+                        Log.d("Tes", "Key: " + users.getKey());
                         if (users.getKey() != personId) {
                             User user;
                             user = dataSnapshot.child("users").child(users.getKey()).getValue(User.class);
                             Log.d("Name", user.getName());
                             LatLng location = new LatLng(user.getLatitude(), user.getLongitude());
-                            Log.d("Tes","Snippet "+String.valueOf(dataSnapshot.child("todos").child(projects.getKey()).child("name")));
+                            Log.d("Tes",String.valueOf(dataSnapshot.child("todos").child(todoId).child("name")));
                             Marker m = mMap.addMarker(new MarkerOptions()
                                     .position(location)
                                     .title(user.getName())
-                                    .snippet(String.valueOf(dataSnapshot.child("todos").child(projects.getKey()).child("name")))
+                                    .snippet(String.valueOf(dataSnapshot.child("todos").child(todoId).child("name")))
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                         }
                     }
                 }
+//
+//                  for (DataSnapshot projects : dataSnapshot.child("user_todos").getChildren()) {
+//                    Log.d("Tes", "here");
+//                    Log.d("Tes", projects.getKey());
+//                    for (DataSnapshot users : dataSnapshot.child("todo_users").getChildren()) {
+//                        if (users.getKey() != personId) {
+//                            User user;
+//                            user = dataSnapshot.child("users").child(users.getKey()).getValue(User.class);
+//                            Log.d("Name", user.getName());
+//                            LatLng location = new LatLng(user.getLatitude(), user.getLongitude());
+//                            Log.d("Tes","Snippet "+String.valueOf(dataSnapshot.child("todos").child(projects.getKey()).child("name")));
+//                            Marker m = mMap.addMarker(new MarkerOptions()
+//                                    .position(location)
+//                                    .title(user.getName())
+//                                    .snippet(String.valueOf(dataSnapshot.child("todos").child(projects.getKey()).child("name")))
+//                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+//                        }
+//                    }
+//                }
 
 //                for (DataSnapshot users : dataSnapshot.getChildren()) {
 //                    Log.d("Tes", "here");
