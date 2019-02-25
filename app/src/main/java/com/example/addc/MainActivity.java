@@ -215,7 +215,6 @@ public class MainActivity extends AppCompatActivity
             Log.w("ACTIVATE","Start NearestWorkshop Activity");
             Intent intent = new Intent(MainActivity.this, TrackFriendsActivity.class);
             startActivity(intent);
-            finish();
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
@@ -228,7 +227,6 @@ public class MainActivity extends AppCompatActivity
             Log.w("ACTIVATE","Start NearestWorkshop Activity");
             Intent intent = new Intent(MainActivity.this, NavigateNearestWorkshop.class);
             startActivity(intent);
-            finish();
         } else if (id == R.id.nav_sign_out) {
             signOut();
         } else if (id == R.id.nav_todo) {
