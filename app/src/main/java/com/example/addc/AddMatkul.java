@@ -3,6 +3,7 @@ package com.example.addc;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -44,12 +45,10 @@ public class AddMatkul extends AppCompatActivity {
     private ArrayList<String> matkul;
     private ValueEventListener eventListener;
 
-    private List<String> selected_matkul;
+    private ArrayList<String> selected_matkul;
     private ArrayAdapter adapter;
 
     private String personId;
-
-
 
 
     @Override
@@ -70,14 +69,14 @@ public class AddMatkul extends AppCompatActivity {
         eventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds:dataSnapshot.getChildren()){
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     try {
                         String id = ds.getKey();
                         String nama = ds.child("name").getValue().toString();
                         String mataKuliah = id + " - " + nama;
-                        Log.w("isi",mataKuliah);
+                        Log.w("isi", mataKuliah);
                         matkul.add(mataKuliah);
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         Log.w(TAG, "Failed to retrieve data");
                     }
                 }
@@ -96,10 +95,17 @@ public class AddMatkul extends AppCompatActivity {
         selected_matkul = new ArrayList<String>();
 
         adapter = new ArrayAdapter<String>(this,
-                R.layout.activity_listview,R.id.view_matkul,selected_matkul);
+                R.layout.activity_listview, R.id.view_matkul, selected_matkul);
 
         listView.setAdapter(adapter);
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        getMatkulEnrolled();
     }
 
     @Override
@@ -119,12 +125,12 @@ public class AddMatkul extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        selected_matkul.add(array_matkul[which]);
-                        adapter.notifyDataSetChanged();
+//                        selected_matkul.add(array_matkul[which]);
+//                        adapter.notifyDataSetChanged();
 
                         //send data to database
                         String selected_id = array_matkul[which].split("\\s+")[0];
-                        Log.w("bangsat",selected_id);
+                        Log.w("bangsat", selected_id);
 
                         mDatabase_enrollment.child("matakuliah_enrollment").child(selected_id).child(personId).setValue(true);
                         mDatabase_enrollment.child("user_enrollment").child(personId).child(selected_id).setValue(true);
@@ -138,7 +144,7 @@ public class AddMatkul extends AppCompatActivity {
         }
     }
 
-    public void deleteMatkul(View view){
+    public void deleteMatkul(View view) {
         View parent = (View) view.getParent();
         TextView matkulTextView = (TextView) parent.findViewById(R.id.view_matkul);
         String matkul = String.valueOf(matkulTextView.getText());
@@ -148,9 +154,35 @@ public class AddMatkul extends AppCompatActivity {
         mDatabase_enrollment.child("matakuliah_enrollment").child(delete_matkul_id).child(personId).removeValue();
         mDatabase_enrollment.child("user_enrollment").child(personId).child(delete_matkul_id).removeValue();
 
-        selected_matkul.remove(selected_matkul.indexOf(matkul));
+//        selected_matkul.remove(selected_matkul.indexOf(matkul));
+//
+//        adapter.notifyDataSetChanged();
 
-        adapter.notifyDataSetChanged();
+        getMatkulEnrolled();
     }
 
+    private void getMatkulEnrolled() {
+
+
+        DatabaseReference matkulEnrolled = FirebaseDatabase.getInstance().getReference("user_enrollment");
+
+        matkulEnrolled.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                selected_matkul.clear();
+                adapter.clear();
+
+                for (DataSnapshot ds: dataSnapshot.child(personId).getChildren()) {
+                    selected_matkul.add(ds.getKey());
+                }
+
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 }

@@ -152,7 +152,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         String userName = acc.getDisplayName();
         String userEmail = acc.getEmail();
         String userId = acc.getId();
-        String userPhoto = acc.getPhotoUrl().toString();
+        String userPhoto;
+        try {
+            userPhoto = acc.getPhotoUrl().toString();
+        } catch (NullPointerException e) {
+            userPhoto = "";
+        }
 
         User user = new User(userId, userEmail, userName, userPhoto);
 
