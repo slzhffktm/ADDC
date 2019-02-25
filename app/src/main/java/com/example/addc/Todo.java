@@ -9,20 +9,18 @@ public class Todo implements Serializable {
     private String dueDate;
     private String dueTime;
     private String mataKuliahId;
-    private User[] users;
     private boolean done;
 
     public Todo() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public Todo(String name, String description, String dueDate, String dueTime, String mataKuliahId, User[] users, boolean done) {
+    public Todo(String name, String description, String dueDate, String dueTime, String mataKuliahId, boolean done) {
         this.name = name;
         this.description = description;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
         this.mataKuliahId = mataKuliahId;
-        this.users = users;
         this.done = done;
     }
 
@@ -64,14 +62,6 @@ public class Todo implements Serializable {
 
     public void setMataKuliahId(String mataKuliahId) {
         this.mataKuliahId = mataKuliahId;
-    }
-
-    public User[] getUsers() {
-        return users;
-    }
-
-    public void setUsers(User[] users) {
-        this.users = users;
     }
 
     public boolean isDone() {

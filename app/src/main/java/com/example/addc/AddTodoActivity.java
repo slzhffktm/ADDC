@@ -2,12 +2,15 @@ package com.example.addc;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -15,6 +18,8 @@ import android.widget.TimePicker;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.tasks.OnCanceledListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,15 +35,16 @@ import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
 import in.galaxyofandroid.spinerdialog.SpinnerDialog;
 
 public class AddTodoActivity extends AppCompatActivity {
-
-    private DatabaseReference mDatabase;
     final Calendar calendar = Calendar.getInstance();
 
+    EditText editTextName;
+    EditText editTextDescription;
     EditText editTextDueDate;
     EditText editTextDueTime;
     EditText editTextMataKuliah;
     EditText editTextUsers;
     ViewGroup usersCheckBoxContainer;
+    Button addButton;
 
     DatePickerDialog datePickerDialog;
     TimePickerDialog timePickerDialog;
@@ -56,17 +62,20 @@ public class AddTodoActivity extends AppCompatActivity {
 
         getMataKuliahs();
 
+        editTextName = findViewById(R.id.input_name);
         editTextMataKuliah = findViewById(R.id.input_matakuliah);
+        editTextDescription = findViewById(R.id.input_description);
         editTextDueDate = findViewById(R.id.input_duedate);
         editTextDueTime = findViewById(R.id.input_duetime);
         editTextUsers = findViewById(R.id.input_users);
         usersCheckBoxContainer = findViewById(R.id.users_checkbox_container);
+        addButton = findViewById(R.id.btn_add);
 
         editTextMataKuliah.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 spinnerDialog = new SpinnerDialog(AddTodoActivity.this, mataKuliahsString,
-                        "Select Mata Kuliah", R.style.DialogAnimations_SmileWindow,"Cancel");
+                        "Select Mata Kuliah", R.style.DialogAnimations_SmileWindow, "Cancel");
                 spinnerDialog.bindOnSpinerListener(new OnSpinerItemClick() {
                     @Override
                     public void onClick(String item, int position) {
@@ -91,6 +100,7 @@ public class AddTodoActivity extends AppCompatActivity {
                     }
                 }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
                         calendar.get(Calendar.DAY_OF_MONTH));
+                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
                 datePickerDialog.show();
             }
         });
@@ -115,7 +125,7 @@ public class AddTodoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 final ArrayList<String> usersArrayList = getUsersStringArrayList(users);
                 spinnerDialog = new SpinnerDialog(AddTodoActivity.this, usersArrayList,
-                        "Select User in Your Group", R.style.DialogAnimations_SmileWindow,"Cancel");
+                        "Select User in Your Group", R.style.DialogAnimations_SmileWindow, "Cancel");
                 spinnerDialog.bindOnSpinerListener(new OnSpinerItemClick() {
                     @Override
                     public void onClick(String item, int position) {
@@ -130,6 +140,13 @@ public class AddTodoActivity extends AppCompatActivity {
                 spinnerDialog.showSpinerDialog();
             }
         });
+
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addTodo();
+            }
+        });
     }
 
     private void getMataKuliahs() {
@@ -137,7 +154,7 @@ public class AddTodoActivity extends AppCompatActivity {
         table_matakuliah.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     try {
                         mataKuliahsString.add(ds.getKey() + " " + ds.child("name").getValue().toString());
                     } catch (Exception e) {
@@ -167,7 +184,7 @@ public class AddTodoActivity extends AppCompatActivity {
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds: dataSnapshot.child("matakuliah_enrollment").child(idMataKuliah).getChildren()) {
+                for (DataSnapshot ds : dataSnapshot.child("matakuliah_enrollment").child(idMataKuliah).getChildren()) {
                     String userId = ds.getKey();
                     if (!userId.equals(yourId)) {
                         String userEmail = dataSnapshot.child("users").child(userId).child("email").getValue().toString();
@@ -187,8 +204,8 @@ public class AddTodoActivity extends AppCompatActivity {
 
     private ArrayList<String> getUsersStringArrayList(ArrayList<User> usersList) {
         ArrayList<String> usersString = new ArrayList<>();
-        for (User u: usersList) {
-            usersString.add(u.getEmail() + " ("  + u.getName() + ")");
+        for (User u : usersList) {
+            usersString.add(u.getEmail() + " (" + u.getName() + ")");
         }
 
         return usersString;
@@ -197,7 +214,7 @@ public class AddTodoActivity extends AppCompatActivity {
     private void generateUsersCheckBoxes() {
         usersCheckBoxContainer.removeAllViews();
         int id = 0;
-        for (String userString: getUsersStringArrayList(usersAdded)) {
+        for (String userString : getUsersStringArrayList(usersAdded)) {
             CheckBox checkBox = new CheckBox(AddTodoActivity.this);
             checkBox.setText(userString);
             checkBox.setChecked(true);
@@ -215,5 +232,41 @@ public class AddTodoActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void addTodo() {
+        final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        final String yourId = acct.getId();
+
+        Todo todo = new Todo(editTextName.getText().toString(), editTextDescription.getText().toString(),
+                editTextDueDate.getText().toString(), editTextDueTime.getText().toString(),
+                editTextMataKuliah.getText().toString(), false);
+
+        final String todoId = mDatabase.push().getKey();
+
+        mDatabase.child("todos").child(todoId).setValue(todo)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        mDatabase.child("user_todos").child(yourId).child(todoId).setValue(true);
+                        mDatabase.child("todo_users").child(todoId).child(yourId).setValue(true);
+                        for (User user: usersAdded) {
+                            mDatabase.child("user_todos").child(user.getId()).child(todoId).setValue(true);
+                            mDatabase.child("todo_users").child(todoId).child(user.getId()).setValue(true);
+                        }
+
+                        Snackbar.make(findViewById(R.id.addTodoCoordinatorLayout), "Success.", Snackbar.LENGTH_SHORT).show();
+
+                        Intent intent = new Intent(AddTodoActivity.this, TodoListActivity.class);
+                        startActivity(intent);
+                    }
+                })
+                .addOnCanceledListener(new OnCanceledListener() {
+                    @Override
+                    public void onCanceled() {
+                        Snackbar.make(findViewById(R.id.addTodoCoordinatorLayout), "No internet connection.", Snackbar.LENGTH_SHORT).show();
+                    }
+                });
     }
 }
