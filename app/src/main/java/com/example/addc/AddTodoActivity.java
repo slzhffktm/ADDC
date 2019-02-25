@@ -3,6 +3,7 @@ package com.example.addc;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -34,8 +35,11 @@ import java.util.Locale;
 import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
 import in.galaxyofandroid.spinerdialog.SpinnerDialog;
 
+// TODO: 2/25/2019 CREATE FOR EDIT 
 public class AddTodoActivity extends AppCompatActivity {
     final Calendar calendar = Calendar.getInstance();
+
+    String yourId;
 
     EditText editTextName;
     EditText editTextDescription;
@@ -59,6 +63,9 @@ public class AddTodoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         FirebaseApp.initializeApp(this);
         setContentView(R.layout.activity_add_todo);
+
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        yourId = acct.getId();
 
         getMataKuliahs();
 
@@ -150,13 +157,16 @@ public class AddTodoActivity extends AppCompatActivity {
     }
 
     private void getMataKuliahs() {
-        DatabaseReference table_matakuliah = FirebaseDatabase.getInstance().getReference("mata_kuliahs");
-        table_matakuliah.addValueEventListener(new ValueEventListener() {
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+                for (DataSnapshot ds : dataSnapshot.child("user_enrollment").child(yourId).getChildren()) {
                     try {
-                        mataKuliahsString.add(ds.getKey() + " " + ds.child("name").getValue().toString());
+                        String mataKuliahId = ds.getKey();
+                        String mataKuliahName = dataSnapshot.child("mata_kuliahs").child(mataKuliahId).child("name").getValue().toString();
+                        mataKuliahsString.add(mataKuliahId + " " + mataKuliahName);
                     } catch (Exception e) {
                         Log.w("RETRIEVE DATA", "name empty");
                     }
@@ -177,9 +187,6 @@ public class AddTodoActivity extends AppCompatActivity {
     }
 
     private void getUsers(final String idMataKuliah) {
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-        final String yourId = acct.getId();
-
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("");
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -236,8 +243,6 @@ public class AddTodoActivity extends AppCompatActivity {
 
     private void addTodo() {
         final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-        final String yourId = acct.getId();
 
         Todo todo = new Todo(editTextName.getText().toString(), editTextDescription.getText().toString(),
                 editTextDueDate.getText().toString(), editTextDueTime.getText().toString(),
