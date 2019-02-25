@@ -6,9 +6,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.android.gms.location.LocationServices;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -68,12 +66,12 @@ public class TrackingService extends Service {
                 .setContentIntent(broadcastIntent)
                 .setSmallIcon(R.drawable.tracking_enabled);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            startMyOwnForeground();
+            startMyOwnForeground(broadcastIntent);
         else
             startForeground(1, builder.build());
     }
 
-    private void startMyOwnForeground(){
+    private void startMyOwnForeground(PendingIntent broadcastIntent){
         String NOTIFICATION_CHANNEL_ID = "com.example.addc";
         String channelName = "My Background Service";
         NotificationChannel chan = null;
@@ -90,8 +88,8 @@ public class TrackingService extends Service {
                 .setSmallIcon(R.drawable.tracking_enabled)
                 .setContentTitle("ADDC")
                 .setContentText(getString(R.string.tracking_enabled_notif))
-                .setPriority(NotificationManager.IMPORTANCE_MIN)
-                .setCategory(Notification.CATEGORY_SERVICE)
+                .setOngoing(true)
+                .setContentIntent(broadcastIntent)
                 .build();
         startForeground(2, notification);
     }
